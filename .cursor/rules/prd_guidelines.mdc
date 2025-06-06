@@ -1,0 +1,60 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+- **Project Core Technologies & Adherence**
+    - **Strict Technology Stack:** All frontend code MUST use Next.js (React) for the framework, Tailwind CSS for styling, Shadcn UI as a component foundation, and Framer Motion for animations and transitions. Refer to `prd.md` "Important Note for AI Code Generation".
+    - **Shadcn UI Customization:** Shadcn UI components are foundational. They MUST be customized using Tailwind CSS to precisely match the DuoTrak design specifications (appearance, variants, states, typography, spacing). See `prd.md` Section 7.
+    - **No Backend Implementation:** Focus is exclusively on the frontend. Use mock data structures and stubbed API functions for any backend dependencies. See `prd.md` "Important Note for AI Code Generation".
+
+- **Design System Implementation**
+    - **Color Palette:** Strictly adhere to the defined color palette in `prd.md` Section 3. Colors MUST be implemented as CSS custom properties in `styles/globals.css` and integrated into `tailwind.config.js`. Use Tailwind utility classes for application (e.g., `bg-primary-beige`).
+    - **Typography System:** Use the "Inter" font, loaded via `next/font/google` as specified in `prd.md` Section 4. The generated font variable MUST be applied to the root layout and integrated into `tailwind.config.js`. Typographic styles MUST be achieved using Tailwind CSS utility classes.
+    - **Layout & Spacing:**
+        - Implement responsive design for mobile, tablet, and desktop breakpoints defined in `prd.md` Section 5 and configured in `tailwind.config.js`.
+        - Use Tailwind CSS Flexbox and Grid utilities for layouts.
+        - Adhere to the spacing system defined in `prd.md` Section 5, configured in `tailwind.config.js`, and applied via Tailwind utility classes (margins, paddings, gaps).
+        - Main content containers on desktop should use `max-w-screen-xl` (or as specified) and `mx-auto` for centering.
+    - **Iconography:** Use Lucide React icons as specified in `prd.md` Section 6. Import individual icons. Apply sizing and color using Tailwind utilities. Ensure interactive icons have adequate touch targets (min 44x44px).
+
+- **Component Development**
+    - **Location:** Components reside in `components/`, organized by feature or commonality as outlined in `prd.md` Section 14.1.
+    - **Props & States:** Implement all specified props and visual states for components as detailed in `prd.md` Section 7 and Section 10.
+    - **Framer Motion for Animations:** Interactive feedback, state transitions, and specified animations MUST be implemented using Framer Motion as per `prd.md` Section 7 (Component Library) and Section 8 (Motion & Animation Guidelines).
+
+- **State Management & API Interaction**
+    - **Global State:** Use React Context API, primarily `AuthContext`, for global state like user authentication. See `prd.md` Section 14.3.
+    - **Local State & API Data:** For MVP, use `useState` for local component state and `useState`/`useEffect` for fetching data from API stubs. Manage `isLoading` and error states.
+    - **API Stubs:** All backend interactions MUST be implemented as stubbed async functions in the `services/` directory. Components interact with these services, not directly with mock `fetch` calls. See `prd.md` Section 14.4.
+
+- **Routing**
+    - Utilize Next.js file-system routing.
+    - Use `<Link>` component from `next/link` for client-side navigation.
+    - Use `useRouter()` for programmatic navigation and route parameter access.
+    - See `prd.md` Section 14.2.
+
+- **Accessibility (WCAG 2.1 Level AA Target)**
+    - **Semantic HTML:** Use HTML5 elements according to their semantic meaning. See `prd.md` Section 12.1.
+    - **Keyboard Navigation & Focus:** Ensure all interactive elements are focusable and operable via keyboard. Implement clear, visible focus indicators using Tailwind's `focus-visible` utilities and the `primary-accent` color. Preserve Radix UI's focus trapping for modals/dropdowns. See `prd.md` Section 12.2.
+    - **ARIA Attributes:** Use ARIA attributes to enhance accessibility where semantic HTML is insufficient. Preserve Radix UI's default ARIA implementations. Provide `aria-label` for icon-only buttons. See `prd.md` Section 12.3.
+    - **Color Contrast:** Adhere to color palette ensuring text and UI elements meet WCAG AA contrast ratios. See `prd.md` Section 12.4.
+    - **Alternative Text:** All images (`next/image`) MUST have an `alt` attribute. Descriptive for informative images, empty (`alt=""`) for decorative ones. See `prd.md` Section 12.5.
+
+- **Performance**
+    - **Optimistic UI Updates:** Implement optimistic UI updates for key user actions (check-ins, messages, etc.) as specified in `prd.md` Section 13.2.A.
+    - **Image Optimization:** Use Next.js `<Image>` component for all images, configured for external sources if necessary. See `prd.md` Section 13.2.B.
+    - **Code Splitting:** Use `next/dynamic` for large components or those not needed on initial render (e.g., charts, modals), with appropriate loading states (skeletons). See `prd.md` Section 13.2.C.
+    - **Minimize Re-renders:** Apply React best practices (`React.memo`, `useCallback`, `useMemo`, stable `key` prop) judiciously. See `prd.md` Section 13.2.E.
+    - **Font Loading:** Use `next/font` for the "Inter" font. See `prd.md` Section 13.2.H.
+
+- **Error Handling & Empty States**
+    - Implement clear, user-friendly error messages (inline for forms, toasts via Sonner for non-blocking, modals for critical) and empty state UIs as specified in `prd.md` Section 11.
+    - Use the reusable `ErrorDisplay.jsx` and `EmptyState.jsx` components.
+    - Utilize Sonner for toast notifications (install via `npx shadcn@latest add sonner` and add `<Toaster />`).
+
+- **Coding Standards & Structure**
+    - **Project Structure:** Adhere to the project structure outlined in `prd.md` Section 14.1.
+    - **Styling:** Prioritize Tailwind CSS for all styling. Customize Shadcn UI components using Tailwind. Framer Motion for animations. CSS Modules as a last resort. See `prd.md` Section 14.5.
+    - **Next.js Practices:** Follow Next.js conventions for pages, components, and configuration.
+

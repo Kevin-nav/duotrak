@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+alembic
+asyncpg>=0.29.0
+pydantic[email]
+python-dotenv
+python-jose[cryptography]
+passlib[bcrypt]
+psycopg2-binary
+greenlet
+fastapi-cors
+tenacity 
