@@ -6,7 +6,18 @@ import { ScreenHeader } from '@/components/layout/ScreenHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, AlertTriangle, CalendarDays, Repeat, TrendingUp, Target, History, Image as ImageIcon, MessageSquare, CheckCircle2, Circle, SkipForward, HelpCircle } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Loader2, AlertTriangle, CalendarDays, Repeat, TrendingUp, Target, History, Image as ImageIcon, MessageSquare, CheckCircle2, Circle, SkipForward, HelpCircle, Trash2, Pencil } from 'lucide-react';
 import { myTasksService } from '@/services/myTasksService';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -45,6 +56,7 @@ export default function SystemDetailPage() {
   const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const fileInputRef = useRef(null); // For programmatically clicking file input
 
   useEffect(() => {
@@ -128,6 +140,26 @@ export default function SystemDetailPage() {
     };
   }, [imagePreviewUrl]);
 
+  const handleDeleteSystem = async () => {
+    if (!systemTask || isDeleting) return;
+    setIsDeleting(true);
+    try {
+      // Assuming systemService.deleteSystem exists and handles the API call
+      const response = await myTasksService.deleteSystemTask(systemId);
+      if (response.success) {
+        toast.success(`System "${systemTask.name}" deleted successfully.`);
+        // Redirect to the parent goal's page or a general tasks page
+        router.push(systemTask.goalId ? `/goals/${systemTask.goalId}` : '/my-tasks');
+      } else {
+        toast.error(response.message || 'Failed to delete the system.');
+      }
+    } catch (err) {
+      toast.error(err.message || 'An error occurred while deleting the system.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (authIsLoading || isLoading) {
     return (
       <div className="container mx-auto p-4 md:p-6 lg:p-8 flex flex-col items-center justify-center min-h-[calc(100vh-var(--global-nav-height,80px))]">
@@ -189,6 +221,36 @@ export default function SystemDetailPage() {
             { label: "Dashboard", href: "/dashboard" }, 
             { label: "My Tasks", href: "/my-tasks" },
             { label: systemTask.name, isCurrent: true }
+          ]}
+          actions={[
+            <Button key="edit-btn" variant="outline" size="sm" onClick={() => router.push(`/systems/${systemId}/edit`)}>
+              <Pencil className="h-4 w-4 mr-2" />
+              Edit
+            </Button>,
+            <AlertDialog key="delete-dialog">
+              <AlertDialogTrigger asChild>
+                <Button key="delete-btn" variant="destructive" size="sm">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the system
+                    and all of its associated data.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteSystem} disabled={isDeleting}>
+                    {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           ]}
         />
 

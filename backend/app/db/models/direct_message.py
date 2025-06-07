@@ -27,7 +27,7 @@ class DirectMessage(Base):
     # Relationships
     partnership = relationship("Partnership", back_populates="direct_messages")
     sender = relationship("User", back_populates="messages_sent")
-    # reactions = relationship("Reaction", cascade="all, delete-orphan") # Post-MVP
+    reactions = relationship("Reaction", back_populates="direct_message", cascade="all, delete-orphan", lazy="selectin")
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False) 

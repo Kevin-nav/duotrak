@@ -140,18 +140,27 @@ Reflections are children of Goals.
 ### Partnerships
 
 -   **`POST /partnerships/request`**
-    -   **Description**: Sends a partnership request to another user.
-    -   **Request Body**: `PartnershipCreate` schema (requires `approver_id`).
-    -   **Logic**: Fails if a request/partnership already exists, or if trying to partner with oneself.
+    -   **Description**: Sends a partnership request email to a potential partner.
+    -   **Request Body**: `PartnershipCreate` schema (requires `invite_email`).
+    -   **Logic**: Fails if a request/partnership already exists for the requester, or if the invitee is already in a partnership. Generates a secure token and sends an invitation email.
 -   **`GET /partnerships/requests/pending`**
-    -   **Description**: Gets all *incoming* pending partnership requests for the current user.
+    -   **Description**: Gets all *incoming* pending partnership requests for the current user (based on their email).
 -   **`GET /partnerships/current`**
-    -   **Description**: Gets the current user's active (`ACCEPTED`) partnership. Returns 404 if none exists.
+    -   **Description**: Gets the current user's active (`ACTIVE`) partnership. Returns 404 if none exists.
 -   **`PUT /partnerships/requests/{partnership_id}/respond`**
-    -   **Description**: Responds to a request. Only the `approver` can call this.
-    -   **Request Body**: `PartnershipUpdate` schema (status must be `ACCEPTED` or `DECLINED`).
+    -   **Description**: Responds to a request from within the app. Only the user whose email matches the invite can call this.
+    -   **Request Body**: `PartnershipUpdate` schema (status must be `ACTIVE` or `DISSOLVED`).
+-   **`GET /partnerships/accept-invite/{token}`**
+    -   **Description**: Accepts a partnership invite using a token from an email link. The user must be logged in. The frontend should call this endpoint after the user clicks the link in the email.
 -   **`DELETE /partnerships/{partnership_id}`**
-    -   **Description**: Terminates an `ACCEPTED` partnership. Can be called by either partner.
+    -   **Description**: Terminates an `ACTIVE` partnership. Can be called by either partner.
+
+### AI Planner
+
+-   **`POST /planner/generate-plan`**
+    -   **Description**: Takes a user's goal title and description and returns an AI-generated plan of systems. This can be used to pre-fill suggestions when a user is creating a new goal.
+    -   **Request Body**: `AIPlanRequest` schema (`goal_title`, `goal_description`).
+    -   **Response Body**: `AIPlanResponse` schema (`plan_text`).
 
 ### Direct Messages
 
@@ -208,4 +217,5 @@ Comments can be on Goals or Check-ins.
 
 -   **`GoalStatus`**: `"NOT_STARTED"`, `"IN_PROGRESS"`, `"COMPLETED"`, `"ARCHIVED"`
 -   **`GoalPriority`**: `"LOW"`, `"MEDIUM"`, `"HIGH"`
--   **`PartnershipStatus`**: `"PENDING"`, `"ACCEPTED"`, `"DECLINED"`, `"TERMINATED"` 
+-   **`PartnershipStatus`**: `"PENDING_INVITE"`, `"ACTIVE"`, `"DISSOLVED"`, `"EXPIRED_INVITE"`
+-   **`AIStatus`**: `"NOT_STARTED"`, `"IN_PROGRESS"`, `"COMPLETED"`, `"ARCHIVED"` 

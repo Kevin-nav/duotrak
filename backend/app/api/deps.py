@@ -7,7 +7,6 @@ from jose import jwt, JWTError
 
 from app.db.session import SessionLocal
 from app.core.config import settings
-from app.core import security
 from app.db.models.user import User
 from app.schemas.token_schemas import TokenPayload
 from app.crud.crud_user import user as crud_user
@@ -18,7 +17,7 @@ from app.crud.crud_user import user as crud_user
 # from app.core import security
 
 reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"{settings.API_V1_STR}/auth/token" # We'll create this endpoint later
+    tokenUrl=f"{settings.API_V1_STR}/auth/token"
 )
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
@@ -41,10 +40,10 @@ async def get_current_user(
     """
     try:
         payload = jwt.decode(
-            token, settings.JWT_SECRET, algorithms=[security.ALGORITHM]
+            token, settings.JWT_SECRET, algorithms=[settings.ALGORITHM]
         )
         token_data = TokenPayload(**payload)
-    except (JWTError, Exception): # Catch JWT errors and Pydantic validation errors
+    except (JWTError, Exception):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials.",

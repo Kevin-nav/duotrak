@@ -1,13 +1,14 @@
 import uuid
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from app.db.models.partnership import PartnershipStatus
-from app.schemas.user_schemas import UserInfo
+from app.schemas.user_schemas import UserInfo, User
 
 # --- Base Schema ---
 class PartnershipBase(BaseModel):
-    status: Optional[PartnershipStatus] = PartnershipStatus.PENDING
+    # The default status is set by the service layer, so it's just optional here.
+    status: Optional[PartnershipStatus] = None
     
     class Config:
         orm_mode = True

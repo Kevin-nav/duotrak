@@ -4,9 +4,6 @@ from passlib.context import CryptContext
 # available is good practice if we ever need to handle passwords in the backend.
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# The algorithm used for JWTs, should match Supabase's
-ALGORITHM = "HS256"
-
 class Security:
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         return pwd_context.verify(plain_password, hashed_password)

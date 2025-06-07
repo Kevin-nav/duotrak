@@ -40,7 +40,7 @@ class Checkin(Base):
     user = relationship("User", foreign_keys=[user_id], back_populates="checkins_made")
     system = relationship("System", back_populates="checkins")
     verifier = relationship("User", foreign_keys=[verified_by_partner_id], back_populates="verified_checkins")
-    # partnership relationship can be added if needed, but the ID is there for querying.
+    partnership = relationship("Partnership", foreign_keys=[partnership_id])
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False) 

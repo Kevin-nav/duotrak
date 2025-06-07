@@ -26,8 +26,12 @@ class Reaction(Base):
     target_type = Column(SQLAlchemyEnum(ReactionTargetType), nullable=False, index=True)
     target_id = Column(UUID(as_uuid=True), nullable=False, index=True)
 
+    # For direct messages, we can have a specific FK for a more direct relationship
+    direct_message_id = Column(UUID(as_uuid=True), ForeignKey("direct_messages.id", ondelete="CASCADE"), nullable=True, index=True)
+
     # Relationships
     user = relationship("User") # No back_populates needed if not listing reactions on the user model directly
+    direct_message = relationship("DirectMessage", back_populates="reactions")
     
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 

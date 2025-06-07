@@ -17,18 +17,19 @@ class Comment(Base):
     __tablename__ = "comments"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    author_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     
     target_type = Column(SQLAlchemyEnum(CommentTargetType), nullable=False, index=True)
     target_id = Column(UUID(as_uuid=True), nullable=False, index=True)
 
-    parent_comment_id = Column(UUID(as_uuid=True), ForeignKey("comments.id"), nullable=True, index=True)
+    parent_comment_id = Column(UUID(as_uuid=True), ForeignKey("comments.id", ondelete="CASCADE"), nullable=True, index=True)
 
     content = Column(Text, nullable=False)
     
     # Relationships
-    author = relationship("User") # No back-populates needed if not listing comments on the user model directly
-    parent_comment = relationship("Comment", remote_side=[id], backref="replies")
+    user = relationship("User", back_populates="comments")
+    parent = relationship("Comment", remote_side=[id], back_populates="replies", lazy="selectin")
+    replies = relationship("Comment", back_populates="parent", lazy="selectin", cascade="all, delete-orphan")
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False) 
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)

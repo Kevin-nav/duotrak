@@ -70,4 +70,20 @@ class CRUDUser:
         await db.refresh(db_obj)
         return db_obj
 
+    async def create_with_id(
+        self,
+        db: AsyncSession,
+        *,
+        obj_in: UserCreate,
+        user_id: uuid.UUID
+    ) -> User:
+        db_obj = self.model.model_construct(
+            id=user_id,
+            **obj_in.dict()
+        )
+        db.add(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
+        return db_obj
+
 user = CRUDUser(User) 

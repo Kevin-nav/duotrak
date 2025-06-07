@@ -30,11 +30,12 @@ class User(Base):
 
     goals = relationship("Goal", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
     systems_created = relationship("System", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
-    checkins_made = relationship("Checkin", foreign_keys="Checkin.user_id", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
+    checkins = relationship("Checkin", back_populates="user", cascade="all, delete-orphan")
     
     verified_checkins = relationship("Checkin", foreign_keys="Checkin.verified_by_partner_id", back_populates="verifier", lazy="selectin")
 
     reflections = relationship("Reflection", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
+    comments = relationship("Comment", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
     
     messages_sent = relationship("DirectMessage", foreign_keys="DirectMessage.sender_id", back_populates="sender", lazy="selectin")
 
@@ -43,13 +44,24 @@ class User(Base):
 
     theme_preference = Column(String, nullable=True, default="system")
     
-    notification_preferences = Column(JSONB, nullable=False, default=lambda: [
-        { "id": "systemUpdates", "label": "System Updates", "enabled": True },
-        { "id": "goalProgress", "label": "Goal Progress & Streaks", "enabled": True },
-    ])
+    notification_preferences = Column(JSONB, nullable=False, server_default='[{"id": "systemUpdates", "label": "System Updates", "enabled": true}, {"id": "goalProgress", "label": "Goal Progress & Streaks", "enabled": true}]')
 
     last_daily_summary_sent_at = Column(DateTime(timezone=True), nullable=True)
     last_daily_summary_local_date = Column(Date, nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False) 
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    partnerships_as_requester = relationship(
+        "Partnership",
+        foreign_keys="[Partnership.requester_id]",
+        back_populates="requester",
+        cascade="all, delete-orphan",
+    )
+    
+    partnerships_as_approver = relationship(
+        "Partnership",
+        foreign_keys="[Partnership.approver_id]",
+        back_populates="approver",
+        cascade="all, delete-orphan",
+    ) 

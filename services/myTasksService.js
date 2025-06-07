@@ -690,6 +690,67 @@ export const myTasksService = {
     // allUserTasks[taskIndex].partnerComments = null; 
 
     return { success: true, task: allUserTasks[taskIndex], message: "Response to query submitted." };
+  },
+
+  /**
+   * Deletes a system task.
+   * In a real app, this would be: DELETE /api/tasks/{systemId}
+   * @param {string} systemId The ID of the task to delete.
+   * @returns {Promise<{success: boolean, message?: string}>}
+   */
+  deleteSystemTask: async (systemId) => {
+    await new Promise(res => setTimeout(res, 500)); // Simulate network delay
+    const normalizedId = normalizeIdForKey(systemId);
+    
+    const taskIndex = allUserTasks.findIndex(task => task.id === normalizedId);
+    
+    if (taskIndex !== -1) {
+      allUserTasks.splice(taskIndex, 1);
+      delete mockSystemTasks[normalizedId];
+      
+      console.log(`Deleted task ${normalizedId}. Remaining tasks:`, allUserTasks.length);
+      
+      return { success: true };
+    } else {
+      console.error(`Attempted to delete non-existent task with ID: ${normalizedId}`);
+      return { success: false, message: 'Task not found, could not delete.' };
+    }
+  },
+
+  /**
+   * Responds to a partner's query on a task.
+   * In a real app, this would be: POST /api/tasks/{systemId}/respond
+   * @param {string} taskId The ID of the task to respond to.
+   * @param {string} responseText The user's response to the partner's query.
+   * @returns {Promise<{success: boolean, message?: string, task?: object}>}
+   */
+  respondToPartnerQuery: async (taskId, responseText) => {
+    console.log(`myTasksService.respondToPartnerQuery called for taskId: ${taskId}, response: ${responseText}`);
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const normalizedTaskId = normalizeIdForKey(taskId);
+
+    const taskIndex = allUserTasks.findIndex(t => normalizeIdForKey(t.id) === normalizedTaskId);
+    if (taskIndex === -1) {
+      // Fallback check in correctedMockSystemTasks
+       if (correctedMockSystemTasks[normalizedTaskId]) {
+         if (correctedMockSystemTasks[normalizedTaskId].status !== 'Queried') {
+            return { success: false, message: "This task is not currently queried." };
+        }
+        correctedMockSystemTasks[normalizedTaskId].userResponseToQuery = responseText;
+        correctedMockSystemTasks[normalizedTaskId].status = 'Awaiting Verification';
+        return { success: true, task: correctedMockSystemTasks[normalizedTaskId], message: "Response to partner's query submitted." };
+      }
+      return { success: false, message: "Task not found to respond to partner's query." };
+    }
+
+    // Append user's response, or store in a new field
+    allUserTasks[taskIndex].userResponseToQuery = responseText;
+    allUserTasks[taskIndex].status = 'Awaiting Verification'; // Or 'Responded', then partner changes to 'Awaiting Verification'
+    // Clear previous partner comments if you want to, or keep history
+    // allUserTasks[taskIndex].partnerComments = null; 
+
+    return { success: true, task: allUserTasks[taskIndex], message: "Response to partner's query submitted." };
   }
 
   // Future methods:
